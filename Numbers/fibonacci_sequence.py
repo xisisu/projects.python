@@ -27,6 +27,7 @@ def run():
   while True:
     n = input('Enter the number to generate for nth fibonacci sequence: ')
     if n in ('quit', 'exit'):
+      print(fib_map)
       return 0
     elif not n.isdigit():
       print('{} is not a digit'.format(n))
