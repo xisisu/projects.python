@@ -35,8 +35,8 @@ def run():
       print('{} must be greater than 0.'.format(n))
     else:
       nth = GenerateNthFibonacci(fib_map, int(n))
-      nfib = GetUntilFibonacci(fib_map, int(n))
-      print('{}th fib number is {}, closest fib number to n is {}.'.format(n, nth, nfib))
+      n_fib = GetUntilFibonacci(fib_map, int(n))
+      print('{}th fib number is {}, closest fib number to n is {}.'.format(n, nth, n_fib))
 
 
 if __name__ == '__main__':
