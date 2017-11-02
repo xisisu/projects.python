@@ -23,7 +23,7 @@ def GetChanges(n):
           cur[coin] = cur.get(coin, 0) + 1
       dp[amount] = cur
 
-  return dp
+  return dp[n]
 
 
 def run():
