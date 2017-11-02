@@ -15,7 +15,7 @@ def run():
   while True:
     n = input('Enter the number of digits to generate for pi: ')
     if n in ('quit', 'exit'):
-      return 0
+      return
     elif not n.isdigit():
       print('{} is not a digit'.format(n))
     elif int(n) <= 0:

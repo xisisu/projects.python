@@ -35,7 +35,7 @@ def run():
     n = input('Enter the number: ')
     if n in ('quit', 'exit'):
       print(prime_map)
-      return 0
+      return
     elif not n.isdigit():
       print('{} is not a digit'.format(n))
     elif int(n) <= 1:
