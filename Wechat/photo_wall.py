@@ -3,6 +3,7 @@ import os
 
 import PIL.Image as Image
 import itchat
+import re
 
 
 def __GetOutputDir():
@@ -40,7 +41,11 @@ def PlotPhotoWall(send_file = False):
 
   x, y = 0, 0
   image = Image.new('RGBA', (640, 640))
+  p = re.compile('photo_wall_[0-9]+.jpg')
   for file in os.listdir(__GetOutputDir()):
+    if not p.match(file):
+      continue
+
     try:
       cur_img = Image.open(os.path.join(__GetOutputDir(), file))
     except IOError:
