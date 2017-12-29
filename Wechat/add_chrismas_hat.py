@@ -4,6 +4,7 @@ import os
 
 import cv2
 import dlib
+import re
 
 
 def __GetOutput():
@@ -61,7 +62,9 @@ def AddHat(face_img, hat_img):
   predictor = dlib.shape_predictor(predictor_path)
 
   detector = dlib.get_frontal_face_detector()
+  added = False
   for d in detector(face_img, 1):
+    added = True
     x, y, w, h = d.left(), d.top(), d.right() - d.left(), d.bottom() - d.top()
     eye_center = __GetEyeCenter(face_img, d, predictor)
 
@@ -81,20 +84,21 @@ def AddHat(face_img, hat_img):
     face_img[y - resize[1]:y,
     (eye_center[0] - resize[0] // 3):(eye_center[0] + resize[0] // 3 * 2)] = add_hat
 
-  return face_img
+  return face_img, added
 
 
 def run():
   hat_img = cv2.imread(os.path.join(__GetOutput(), 'hat.png'), -1)
-  # p = re.compile('photo_wall_[0-9]+.jpg')
-  # for file in os.listdir('data'):
-  #   if not p.match(file):
-  #     continue
-  for num in [0, 178, 177, 112, 104, 139]:
-    file = 'photo_wall_' + str(num) + '.jpg'
+
+  p = re.compile('photo_wall_[0-9]+.jpg')
+  for file in os.listdir('data'):
+    if not p.match(file):
+      continue
+  # for num in [0, 178, 177, 112, 104, 139]:
+  #   file = 'photo_wall_' + str(num) + '.jpg'
     print('processing ', file)
     face_img = cv2.imread(os.path.join(__GetOutput(), file))
-    add_hat = AddHat(face_img, hat_img)
+    add_hat, _ = AddHat(face_img, hat_img)
     cv2.imwrite(os.path.join(__GetOutput(), 'hat_' + file), add_hat)
 
 
