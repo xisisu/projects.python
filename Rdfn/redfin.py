@@ -10,7 +10,7 @@ import selenium
 from selenium import webdriver
 
 
-def DownloadByZipcode(zipcode=None):
+def __DownloadByZipcode(zipcode=None):
   driver = webdriver.Chrome('chromedriver.exe')
   driver.get('https://www.redfin.com/zipcode/' + zipcode)
   try:
@@ -22,7 +22,7 @@ def DownloadByZipcode(zipcode=None):
   driver.close()
 
 
-def GetKnownZipcodes():
+def __GetKnownZipcodes():
   known_zipcodes = set()
   for f in os.listdir('redfin_data'):
     reader = csv.DictReader(open(os.path.join('redfin_data', f), 'r'))
@@ -34,17 +34,22 @@ def GetKnownZipcodes():
 
 
 def DownloadRedFinAllZipCode():
-  known_zipcodes = GetKnownZipcodes()
+  if not os.path.exists('redfin_data'):
+    os.mkdir('redfin_data')
+  if not os.path.exists('redfin_pic'):
+    os.mkdir('redfin_pic')
+
+  known_zipcodes = __GetKnownZipcodes()
 
   reader = csv.DictReader(open('data/zipcodes.csv', 'r'))
   for row in reader:
     zipcode = row['zipcode']
     if zipcode in known_zipcodes:
       continue
-    DownloadByZipcode(zipcode=zipcode)
+    __DownloadByZipcode(zipcode=zipcode)
 
 
-def GetZipToCity():
+def __GetZipToCity():
   zip_to_city = {}
   reader = csv.DictReader(open('data/zipcodes.csv', 'r'))
   for row in reader:
@@ -53,7 +58,7 @@ def GetZipToCity():
 
 
 def MoveDownloadFiles():
-  zip_to_city = GetZipToCity()
+  zip_to_city = __GetZipToCity()
 
   download_dir = 'C:/Users/xisis/Downloads'
   for f in os.listdir(download_dir):
@@ -67,7 +72,7 @@ def MoveDownloadFiles():
     shutil.copy(os.path.join(download_dir, f), os.path.join('redfin_data', city + '_' + zip + '.csv'))
 
 
-def GetAllData():
+def __GetAllData():
   list_ = []
   for f in os.listdir('redfin_data'):
     if not f.endswith('.csv'):
@@ -78,9 +83,9 @@ def GetAllData():
   return df
 
 
-def GetPreparedData():
-  df = GetAllData()
-  zip_to_city = GetZipToCity()
+def __GetPreparedData():
+  df = __GetAllData()
+  zip_to_city = __GetZipToCity()
   # drop unwanted rows
   df.drop(['SOLD DATE', 'STATE', 'STATUS', 'NEXT OPEN HOUSE START TIME', 'NEXT OPEN HOUSE END TIME',
            'URL (SEE http://www.redfin.com/buy-a-home/comparative-market-analysis FOR INFO ON PRICING)',
@@ -98,7 +103,7 @@ def GetPreparedData():
   return df
 
 
-def PlotInvenotry(df=None):
+def __PlotInvenotry(df=None):
   fig = df['TAG'].value_counts().plot.barh(figsize=(20, 10))
   fig.set_xlabel('Inventory')
   fig.set_ylabel('City')
@@ -108,7 +113,7 @@ def PlotInvenotry(df=None):
   plt.close('all')
 
 
-def PlotDistribution(df=None, col=None, xlim=None):
+def __PlotDistribution(df=None, col=None, xlim=None):
   df2 = pd.DataFrame({c: vals[col] for c, vals in df.groupby('TAG')})
   median = df2.median().sort_values()
   fig = df2[median.index].boxplot(figsize=(20, 10), vert=False)
@@ -122,7 +127,7 @@ def PlotDistribution(df=None, col=None, xlim=None):
   plt.close('all')
 
 
-def PlotInventoryByPropertyType(df=None, col=None):
+def __PlotInventoryByPropertyType(df=None, col=None):
   tags = df['TAG'].unique()
   property_type = df[col].unique()
   df_property_type = pd.DataFrame(index=tags)
@@ -143,30 +148,30 @@ def PlotInventoryByPropertyType(df=None, col=None):
 
 
 def GenerateAnalysisPlot():
-  df = GetPreparedData()
+  df = __GetPreparedData()
 
-  PlotDistribution(df=df, col='PRICE', xlim=[0, 1500])
-  PlotDistribution(df=df, col='$/SQUARE FEET', xlim=[0, 1000])
-  PlotDistribution(df=df, col='SQUARE FEET', xlim=[0, 3000])
-  PlotDistribution(df=df, col='DAYS ON MARKET', xlim=[0, 180])
-  PlotDistribution(df=df, col='YEAR BUILT', xlim=[1800, 2020])
+  __PlotDistribution(df=df, col='PRICE', xlim=[0, 1500])
+  __PlotDistribution(df=df, col='$/SQUARE FEET', xlim=[0, 1000])
+  __PlotDistribution(df=df, col='SQUARE FEET', xlim=[0, 3000])
+  __PlotDistribution(df=df, col='DAYS ON MARKET', xlim=[0, 180])
+  __PlotDistribution(df=df, col='YEAR BUILT', xlim=[1800, 2020])
 
-  PlotInvenotry(df)
-  PlotInventoryByPropertyType(df, col='PROPERTY TYPE')
-  PlotInventoryByPropertyType(df, col='SALE TYPE')
+  __PlotInvenotry(df)
+  __PlotInventoryByPropertyType(df, col='PROPERTY TYPE')
+  __PlotInventoryByPropertyType(df, col='SALE TYPE')
 
   df2 = df.copy()
   col = 'BEDS'
   df2.dropna(subset=[col], inplace=True)
   df2[col] = df2[col].apply(lambda x: '<=2' if int(x) <= 2 else x)
   df2[col] = df2[col].apply(lambda x: '>=7' if isinstance(x, float) and int(x) >= 7 else x)
-  PlotInventoryByPropertyType(df2, col=col)
+  __PlotInventoryByPropertyType(df2, col=col)
 
   df2 = df.copy()
   col = 'BATHS'
   df2.dropna(subset=[col], inplace=True)
   df2[col] = df2[col].apply(lambda x: '>=3' if int(x) >= 3 else x)
-  PlotInventoryByPropertyType(df2, col=col)
+  __PlotInventoryByPropertyType(df2, col=col)
 
   df2 = df.copy()
   col = 'YEAR BUILT'
@@ -177,7 +182,7 @@ def GenerateAnalysisPlot():
   df2[col] = df2[col].apply(lambda x: '(1950,1975]' if isinstance(x, float) and int(x) <= 1975 else x)
   df2[col] = df2[col].apply(lambda x: '(1975,2000]' if isinstance(x, float) and int(x) <= 2000 else x)
   df2[col] = df2[col].apply(lambda x: '(2000,now]' if isinstance(x, float) and int(x) <= 3000 else x)
-  PlotInventoryByPropertyType(df2, col=col)
+  __PlotInventoryByPropertyType(df2, col=col)
 
   df2 = df.copy()
   col = 'SQUARE FEET'
@@ -187,7 +192,7 @@ def GenerateAnalysisPlot():
   df2[col] = df2[col].apply(lambda x: '(1500,2000]' if isinstance(x, float) and int(x) <= 2000 else x)
   df2[col] = df2[col].apply(lambda x: '(2000,2500]' if isinstance(x, float) and int(x) <= 2500 else x)
   df2[col] = df2[col].apply(lambda x: '(2500,more]' if isinstance(x, float) else x)
-  PlotInventoryByPropertyType(df2, col=col)
+  __PlotInventoryByPropertyType(df2, col=col)
 
   df2 = df.copy()
   col = 'LOT SIZE'
@@ -197,7 +202,7 @@ def GenerateAnalysisPlot():
   df2[col] = df2[col].apply(lambda x: '(1500,2000]' if isinstance(x, float) and int(x) <= 2000 else x)
   df2[col] = df2[col].apply(lambda x: '(2000,2500]' if isinstance(x, float) and int(x) <= 2500 else x)
   df2[col] = df2[col].apply(lambda x: '(2500,more]' if isinstance(x, float) else x)
-  PlotInventoryByPropertyType(df2, col=col)
+  __PlotInventoryByPropertyType(df2, col=col)
 
   df2 = df.copy()
   col = 'DAYS ON MARKET'
@@ -207,7 +212,7 @@ def GenerateAnalysisPlot():
   df2[col] = df2[col].apply(lambda x: '(14,30]' if isinstance(x, float) and int(x) <= 30 else x)
   df2[col] = df2[col].apply(lambda x: '(30,60]' if isinstance(x, float) and int(x) <= 60 else x)
   df2[col] = df2[col].apply(lambda x: '(60,more]' if isinstance(x, float) else x)
-  PlotInventoryByPropertyType(df2, col=col)
+  __PlotInventoryByPropertyType(df2, col=col)
 
   df2 = df.copy()
   col = '$/SQUARE FEET'
@@ -217,18 +222,11 @@ def GenerateAnalysisPlot():
   df2[col] = df2[col].apply(lambda x: '(300,400]' if isinstance(x, float) and int(x) <= 400 else x)
   df2[col] = df2[col].apply(lambda x: '(400,500]' if isinstance(x, float) and int(x) <= 500 else x)
   df2[col] = df2[col].apply(lambda x: '(500,more]' if isinstance(x, float) else x)
-  PlotInventoryByPropertyType(df2, col=col)
+  __PlotInventoryByPropertyType(df2, col=col)
 
-
-def test():
-  df = pd.DataFrame(np.random.rand(10, 4), columns=['a', 'b', 'c', 'd'])
-  df.plot.bar(stacked=True)
-  print(df)
-  plt.show()
 
 
 if __name__ == '__main__':
-  # test()
-  # DownloadRedFinAllZipCode()
-  # MoveDownloadFiles()
+  DownloadRedFinAllZipCode()
+  MoveDownloadFiles()
   GenerateAnalysisPlot()
