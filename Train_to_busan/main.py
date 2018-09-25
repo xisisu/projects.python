@@ -1,6 +1,8 @@
 import argparse
 import pprint
-import jieba, codecs, math
+
+import codecs
+import jieba
 import jieba.posseg as pseg
 
 
@@ -15,7 +17,6 @@ def get_lines(input_filename, input_dict):
         if w.flag != 'nr' or len(w.word) < 2:
           continue
         line_names[-1].append(w.word)
-        print(w)
   return line_names
 
 

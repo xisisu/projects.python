@@ -32,3 +32,4 @@ class Screen(object):
       self.cast(self.help_string1)
 
     self.cast(self.help_string2)
+    self.screen.refresh()
