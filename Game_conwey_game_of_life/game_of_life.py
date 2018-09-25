@@ -1,3 +1,5 @@
+# http://web.stanford.edu/~cdebs/GameOfLife/
+
 import curses
 import random
 
@@ -10,7 +12,10 @@ class GameOfLife(object):
   def __init__(self, stdscr, width, height):
     self.stdscr = stdscr
     self.size = (width, height)
-    self.random_world()
+    # self.random_world()
+    self.organize_world()
+    print(type(self.live_cells))
+    print(self.live_cells)
 
   def random_world(self):
     width, height = self.size
@@ -45,10 +50,38 @@ class GameOfLife(object):
     cell = (x, y)
     return '0' if cell in self.live_cells else ' '
 
+  def organize_world(self):
+    width, height = self.size
+    if width <= 40 or height <= 40:
+      print('Cannot init with a small graph.')
+      exit()
+
+    self.live_cells = set()
+
+    ############## static blocks #############
+    # block
+    self.live_cells = self.live_cells.union(set([(1, 1), (1, 2), (2, 1), (2, 2)]))
+
+    # boat
+    self.live_cells = self.live_cells.union(set([(1, 5), (1, 6), (2, 5), (2, 7), (3, 6)]))
+
+    # loaf
+    self.live_cells = self.live_cells.union(set([(1, 10), (1, 11), (2, 9), (2, 12), (3, 10), (3, 12), (4, 11)]))
+
+    # beehive
+    self.live_cells = self.live_cells.union(set([(1, 16), (1, 17), (2, 15), (2, 18), (3, 16), (3, 17)]))
+
+    ########### blink blocks ##############
+    # blinker
+    self.live_cells = self.live_cells.union(set([(10, 1), (10, 2), (10, 3)]))
+
+    # beacon
+    self.live_cells = self.live_cells.union(
+      set([(10, 7), (10, 8), (11, 7), (11, 8), (12, 9), (12, 10), (13, 9), (13, 10)]))
 
 def main(stdsrc):
-  game_of_life = GameOfLife(stdscr=stdsrc, width=40, height=40)
-  for _ in range(100):
+  game_of_life = GameOfLife(stdscr=stdsrc, width=50, height=50)
+  for _ in range(10):
     game_of_life.draw()
     game_of_life.evolve()
     sleep(0.1)
