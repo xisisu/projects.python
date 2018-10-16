@@ -43,9 +43,12 @@ def download_img(imgurl, dir):
   file = "{}{}".format(dir, name)
   if os.path.exists(file):
     return
-  item = requests.get(imgurl).content
-  with open(file, 'wb') as f:
-    f.write(item)
+  try:
+    item = requests.get(imgurl).content
+    with open(file, 'wb') as f:
+      f.write(item)
+  except requests.exceptions.ConnectionError:
+    print("Error downloading ", imgurl)
 
 
 def process_page(page_url, dir):
@@ -54,9 +57,20 @@ def process_page(page_url, dir):
     download_img(img, dir)
 
 
-if __name__ == '__main__':
+def run_parallel(start=1, end=212):
   pages = []
-  for i in range(1, 44):
-    pages.append("http://jandan.net/ooxx/page-{}".format(i))
+  for i in range(start, end):
+    pages.append("http://jandan.net/pic/page-{}".format(i))
   p = Pool(processes=4)
-  p.map(partial(process_page, dir='D:/Data/jiandan/'), pages)
+  p.map(partial(process_page, dir='D:/Data/wuliao/'), pages)
+
+
+def run_sequential(start=1, end=212):
+  for i in range(start, end):
+    page = "http://jandan.net/pic/page-{}".format(i)
+    process_page(page_url=page, dir='D:/Data/wuliao/')
+
+
+if __name__ == '__main__':
+  # run_sequential(start=1, end=212)
+  run_parallel(start=139, end=212)
