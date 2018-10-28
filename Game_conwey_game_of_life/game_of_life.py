@@ -48,8 +48,8 @@ class GameOfLife(object):
     return '0' if cell in self.live_cells else ' '
 
 
-def main(stdsrc):
-  game_of_life = GameOfLife(stdscr=stdsrc, width=50, height=50)
+def main(stdscr):
+  game_of_life = GameOfLife(stdscr=stdscr, width=50, height=50)
   for _ in range(10):
     game_of_life.draw()
     game_of_life.evolve()
