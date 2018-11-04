@@ -34,7 +34,7 @@ def generate_html(from_person, to_person, words, title):
 
 
 def run():
-  generate_html(from_person='Sisu', to_person='Elva', words='I Love You', title='Chou pi lu')
+  generate_html(from_person='Sisu', to_person='Elva', words='Elva Lu', title='Chou pi lu')
 
 
 if __name__ == '__main__':
