@@ -36,13 +36,6 @@ class TicTacToe:
         continue
       return pos-1 # get the real index.
   
-  def place_cell(self, pos, value):
-    if self.board[pos] != self.EMPTY:
-      print('taken')
-      return    
-    self.board[pos] = value
-    self.display_board()
-
   def get_ai_pos(self):
     gain = map(lambda x : x**2, self.compute_score_for_all_cells(self.AI))
     risk = map(lambda x : x**2, self.compute_score_for_all_cells(self.PLAYER))    
@@ -51,6 +44,12 @@ class TicTacToe:
     if max_score == 0: # all cells are taken.
       return None
     return random.choice([idx for idx in range(len(scores)) if scores[idx] == max_score])
+
+  def place_cell(self, pos, value):
+    if self.board[pos] != self.EMPTY:
+      raise Exception('pos {} taken'.format(pos))
+    self.board[pos] = value
+    self.display_board()
 
   def is_game_over(self, pos):
     return self.get_max_score_at_one_cell(pos, self.board[pos]) >= self.board_size
