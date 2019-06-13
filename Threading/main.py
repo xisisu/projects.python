@@ -1,3 +1,5 @@
+# Due to global interpreter lock in threads, the threads version can use at most 100% CPU, so it is much slower.
+
 import math
 import os
 import time
@@ -38,7 +40,7 @@ def run_process():
 
 if __name__ == '__main__':
   start = time.time()
-  run_thread()
-  # run_process()
+  # run_thread()
+  run_process()
   finish = time.time() - start
   print('total time: {}'.format(finish))
